@@ -48,6 +48,8 @@ app.get("/", (req, res) => {
   res.send("🧘‍♀️ Sukoon API is running. Use POST /chat to talk to the AI therapist.");
 });
 
-app.listen(5000, () => {
-  console.log("✅ Sukoon backend running with Groq at http://localhost:5000");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Sukoon backend running on port ${PORT}`);
 });
+
