@@ -8,36 +8,38 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// Chat endpoint
 app.post("/chat", async (req, res) => {
   const { userMessage, systemPrompt } = req.body;
 
   try {
     const groqResponse = await axios.post(
       "https://api.groq.com/openai/v1/chat/completions",
-   {
-  model: "llama-3.1-8b-instant",
-  messages: [
-    {
-      role: "system",
-      content: systemPrompt || 
-        "You are Sukoon, a compassionate AI therapist. Respond with empathy, calmness, and kindness. Keep responses short, thoughtful, and emotionally supportive. Use open-ended questions. Avoid giving direct advice or diagnosing. Never be judgmental. Help users reflect and feel safe.",
-    },
-    {
-      role: "user",
-      content: userMessage,
-    },
-  ],
-}
-
+      {
+        model: "llama-3.1-8b-instant", // ✅ updated model
+        messages: [
+          {
+            role: "system",
+            content:
+              systemPrompt ||
+              "You are Sukoon, a compassionate AI therapist. Respond with empathy, calmness, and kindness. Keep responses short, thoughtful, and emotionally supportive. Use open-ended questions. Avoid giving direct advice or diagnosing. Never be judgmental. Help users reflect and feel safe.",
+          },
+          {
+            role: "user",
+            content: userMessage,
+          },
+        ],
+      },
       {
         headers: {
-          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           "Content-Type": "application/json",
         },
       }
     );
 
-    const reply = groqResponse.data.choices[0].message.content;
+    // ✅ Correct way to access Groq response
+    const reply = groqResponse.data.choices[0].message?.content;
     res.json({ reply });
   } catch (error) {
     console.error("Groq Error:", error.response?.data || error.message);
@@ -45,12 +47,13 @@ app.post("/chat", async (req, res) => {
   }
 });
 
+// Root endpoint
 app.get("/", (req, res) => {
   res.send("🧘‍♀️ Sukoon API is running. Use POST /chat to talk to the AI therapist.");
 });
 
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Sukoon backend running on port ${PORT}`);
 });
-
